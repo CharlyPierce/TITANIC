@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Instala las dependencias necesarias
 COPY requirements.txt /app/
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia el código del modelo al contenedor
