@@ -242,8 +242,7 @@ class DataSetPreparation(BaseEstimator, TransformerMixin):
     @staticmethod   #Los metodos estaticos no usan self
     def assign_quantile(df, column, n_quantiles):
         labels = list(range(1, n_quantiles + 1))
-        return pd.qcut(df[column], q=n_quantiles, labels=labels, duplicates='drop').astype(int)
-
+        return pd.qcut(df[column], q=n_quantiles, labels=labels).astype(int)
     @staticmethod
     def categorize_embarked(em):
         em_lower = em.lower()
@@ -357,8 +356,7 @@ class PredictData(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.best_model = None
         self.columns_ = None
-        if os.path.exists("../key.json"):
-            os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../key.json"
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./key.json"
 
     def fit(self, data_, y=None):
         self.load_model()
@@ -431,8 +429,7 @@ class PredictData(BaseEstimator, TransformerMixin):
             print(f"Error al cargar el modelo pre-entrenado: {str(e)}")
 
 def load_model():
-    if os.path.exists("../key.json"):
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../key.json"
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./key.json"
     gcs_client = storage.Client()
     bucket_name = 'models_ai_save'
     prefix = 'pipeline/'
