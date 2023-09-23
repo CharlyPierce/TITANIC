@@ -183,10 +183,7 @@ class DataSetPreparation(BaseEstimator, TransformerMixin):
         for dataset in data:
             dataset['Fare_Per_Person'] = dataset['Fare']/(dataset['relatives']+1)
             dataset['Fare_Per_Person'] = dataset['Fare_Per_Person'].astype(int)
-        # Crear columnas basadas en diferentes cuantiles
-        for i in range(3, 16):  # Desde 3 hasta 15 cuantiles
-            col_name = f"AGE_NoCuantiles_{i}"
-            X[col_name] = self.assign_quantile(X, "Age", i)
+        # Crear columnas basadas en diferentes cuantiles 
         data_transformed = self.preprocessor.transform(X)
         df_transformed = pd.DataFrame(data_transformed)
         X = pd.concat([X.reset_index(drop=True), df_transformed.reset_index(drop=True)], axis=1)
@@ -239,10 +236,10 @@ class DataSetPreparation(BaseEstimator, TransformerMixin):
         freq = self.ticket_frequencies.get(ticket, 0)
         return freq if 1 <= freq <= 7 else 0
     # Función para asignar cuantiles
-    @staticmethod   #Los metodos estaticos no usan self
+    @staticmethod
     def assign_quantile(df, column, n_quantiles):
         labels = list(range(1, n_quantiles + 1))
-        return pd.qcut(df[column], q=n_quantiles, labels=labels).astype(int)
+        return pd.qcut(df[column], q=n_quantiles, labels=labels, retbins=True, duplicates='drop') 
     @staticmethod
     def categorize_embarked(em):
         em_lower = em.lower()
@@ -292,6 +289,7 @@ class DataSetPreparation(BaseEstimator, TransformerMixin):
 
         df_transformed = pd.DataFrame(data_transformed, columns=columns_transformed)
         return df_transformed
+
 
 
 class feature_engineer(BaseEstimator, TransformerMixin):
@@ -356,7 +354,7 @@ class PredictData(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.best_model = None
         self.columns_ = None
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./key.json"
+        if os.path.exists("../key.json"): os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../key.json"
 
     def fit(self, data_, y=None):
         self.load_model()
@@ -429,7 +427,7 @@ class PredictData(BaseEstimator, TransformerMixin):
             print(f"Error al cargar el modelo pre-entrenado: {str(e)}")
 
 def load_model():
-    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./key.json"
+    if os.path.exists("../key.json"): os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "../key.json"
     gcs_client = storage.Client()
     bucket_name = 'models_ai_save'
     prefix = 'pipeline/'
