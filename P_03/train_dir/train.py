@@ -9,8 +9,8 @@ model_sequential = tf.keras.Sequential([
     tf.keras.layers.Dense(1),
 ])
 
-strategy = tf.distribute.get_strategy() 
-#strategy = tf.distribute.MirroredStrategy()  # varias GPUs en una máquina.
+#strategy = tf.distribute.get_strategy() 
+strategy = tf.distribute.MirroredStrategy()  # varias GPUs en una máquina.
 # Abrir un scope de estrategia
 with strategy.scope():
     model = model_sequential
@@ -39,7 +39,7 @@ model.fit(x_train, y_train, epochs=3, batch_size=32, callbacks=[checkpoint])
 x_test = np.random.random((200, 10))
 y_test = np.random.randint(2, size=(200,))
 evv = model.evaluate(x_test, y_test)
-print(evv)
+print("HERE: ",evv)
 
 # Guardar el modelo final en el bucket de GCS
 model.save('gs://models_ai_save/model_final')
